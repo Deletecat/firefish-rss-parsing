@@ -19,7 +19,7 @@ sudo apt install python3 python3-feedparser wget
 
 This may be different for the distribution you may be using.
 
-## What data does trhis script use?
+## What data does this script use?
 
 This script uses the following data from the rss feed:
 - feed['title'] - this contains the display name and the username of the firefish account
