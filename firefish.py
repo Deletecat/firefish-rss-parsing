@@ -34,19 +34,16 @@ for index in range(len(feed.entries)):
 
 #__split off the file extention
 pfpType = userpfp.split(".")
-#__if the file extension is gif, download the gif as 'pfp.gif'
+#__if the file extension is gif, set the pfptype to 'pfp.gif'
 if pfpType[len(pfpType)-1] == "gif":
-    os.system(f"wget -O pfp.gif {userpfp}")
     #__set userpfp to local file
-    userpfp = "pfp.gif"
-#__if the file extension is png, download the png as 'pfp.png'
+    pfpType = "pfp.gif"
+#__if the file extension is png, set the pfptype to 'pfp.png'
 elif pfpType[len(pfpType)-1] == "png":
-    os.system(f"wget -O pfp.png {userpfp}")
-    userpfp = "pfp.png"
-#__if the file extension is jgp, download the jpg as 'pfp.jpg'
+    pfpType = "pfp.png"
+#__if the file extension is jpg, set the pfptype to 'pfp.jpg'
 elif pfpType[len(pfpType)-1] == "jpg":
-    os.system(f"wget -O pfp.jpg {userpfp}")
-    userpfp = "pfp.jpg"
+    pfpType = "pfp.jpg"
 
 """
 Now that the data has been read into the array, 
@@ -83,7 +80,23 @@ for index in range(len(entry_data)):
     <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
 #__end page
 html_lines += "</body>\n</html>"
-#__open the file in write mode, this will create the file if it doesn't already exist
-with open("index.html","w") as writer:
-    #__write the page to file
-    writer.write(html_lines)
+
+#__old html checking
+old_file = os.path.isfile('index.html')
+#__do this if the file does exist
+if old_file == True:
+    old_html = "" #__store old html code
+    #__open the old file
+    with open("index.html","r") as reader:
+        #__add each line from old file to old_html
+        for line in reader:
+            old_html += line 
+
+#__only make changes if needed
+if old_html != html_lines:
+    #__download pfp
+    os.system(f"wget -O {pfpType} {userpfp}")
+    #__open the file in write mode, this will create the file if it doesn't already exist
+    with open("index.html","w") as writer:
+        #__write the page to file
+        writer.write(html_lines)
