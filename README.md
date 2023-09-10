@@ -35,6 +35,7 @@ This script uses the following data from the rss feed:
 My code is a bit shit, but you can change the following variables:
 - url - replace with your account url / rss feed
 - stylesheet - replace with the name of your stylesheet
+- entry_max - if you want more entries to be displayed, change this value.
 
 The script will overwrite the previous `index.html` everytime it is run. It also downloads your profile picture from the cdn every time it is run. I am using an <iframe\> to display this on my site's home page without using up the instance's bandwidth. 
 
