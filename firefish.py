@@ -97,13 +97,7 @@ if old_file == True:
 if old_html != html_lines:
     #__download pfp
     os.system(f"wget -O {pfpType} {userpfp}")
-    updated = open("updated","x") #__create a file called updated - used in github action script
-    updated.close() #__close the newly create file
     #__open the file in write mode, this will create the file if it doesn't already exist
     with open("index.html","w") as writer:
         #__write the page to file
         writer.write(html_lines)
-#__if there hasn't been any change
-else:
-    #__delete updated - means the action script for updating the repo will not activate
-    os.system("rm -rf updated")
