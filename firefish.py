@@ -81,11 +81,12 @@ for index in range(len(entry_data)):
 #__end page
 html_lines += "</body>\n</html>"
 
+old_html = "" #__store old html code
+
 #__old html checking
 old_file = os.path.isfile('index.html')
 #__do this if the file does exist
 if old_file == True:
-    old_html = "" #__store old html code
     #__open the old file
     with open("index.html","r") as reader:
         #__add each line from old file to old_html
@@ -96,7 +97,13 @@ if old_file == True:
 if old_html != html_lines:
     #__download pfp
     os.system(f"wget -O {pfpType} {userpfp}")
+    updated = open("updated","x") #__create a file called updated - used in github action script
+    updated.close() #__close the newly create file
     #__open the file in write mode, this will create the file if it doesn't already exist
     with open("index.html","w") as writer:
         #__write the page to file
         writer.write(html_lines)
+#__if there hasn't been any change
+else:
+    #__delete updated - means the action script for updating the repo will not activate
+    os.system("rm -rf updated")
