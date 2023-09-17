@@ -32,18 +32,20 @@ for index in range(len(feed.entries)):
                       "content":entry.content[0]['value']}
         entry_data.append(entry_temp) #__add our temporary dictionary to our array
 
-#__split off the file extention
-pfpType = userpfp.split(".")
-#__if the file extension is gif, set the pfptype to 'pfp.gif'
-if pfpType[len(pfpType)-1] == "gif":
-    #__set userpfp to local file
-    pfpType = "pfp.gif"
-#__if the file extension is png, set the pfptype to 'pfp.png'
-elif pfpType[len(pfpType)-1] == "png":
-    pfpType = "pfp.png"
-#__if the file extension is jpg, set the pfptype to 'pfp.jpg'
-elif pfpType[len(pfpType)-1] == "jpg":
-    pfpType = "pfp.jpg"
+#__declare variables
+pfpName = ""
+slashCounter = 0
+#__repeat for every character in the pfp file url (probably inefficient)
+for index in range(len(feed.feed.image['href'])):
+    #__count every forward slash
+    if feed.feed.image['href'][index] == "/":
+        slashCounter+=1
+    #__cdn url has 4 forward slashes (including for protocol (https://)), 4th slash should have pfp (or at least it does on kitty.social)
+    if slashCounter == 4:
+        #__set the name of the file to pfpName (used for generating the rss page)
+        pfpName = feed.feed.image['href'][index+1:]
+        #__stop the loop as continuing would be silly
+        break
 
 """
 Now that the data has been read into the array, 
@@ -74,7 +76,7 @@ for index in range(len(entry_data)):
     #__replaces new lines with <br> tags
     content=content.replace("\n","<br>")
     #__add entry data to page
-    html_lines += f'''<img src="{pfpType}"><h3><a href="{userlink}">{username}</a></h3>
+    html_lines += f'''<img src="{pfpName}"><h3><a href="{userlink}">{username}</a></h3>
     <h5>{entry_data[index]["published"]}</h5>
     <p>{content}</p>
     <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
@@ -95,8 +97,12 @@ if old_file == True:
 
 #__only make changes if needed
 if old_html != html_lines:
-    #__download pfp
-    os.system(f"wget -O {pfpType} {userpfp}")
+    #__check if the current profile picture doesn't exist - this should only download a new pfp if neccessary 
+    if os.path.exists(pfpName) == False:
+        #__remove old pfps
+        os.system("rm -rf *.gif *.png *.jpg")
+        #__download pfp
+        os.system(f"wget {userpfp}")
     #__open the file in write mode, this will create the file if it doesn't already exist
     with open("index.html","w") as writer:
         #__write the page to file
