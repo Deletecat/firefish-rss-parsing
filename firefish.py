@@ -58,6 +58,7 @@ def getPFP(feed):
 
 def generatePage(entry_data, pfpName, userlink, username):
     stylesheet = "style.css"
+    javascript = "script.js"
     #__set initial lines of html
     html_lines = f"""<!DOCTYPE html> 
     <html lang="en"> 
@@ -65,6 +66,7 @@ def generatePage(entry_data, pfpName, userlink, username):
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{stylesheet}">
+        <script src="{javascript}"></script>
         <title>RSS Feed</title>
     </head>
     <body>
@@ -81,7 +83,7 @@ def generatePage(entry_data, pfpName, userlink, username):
         #__replaces new lines with <br> tags
         content=content.replace("\n","<br>")
         #__add entry data to page
-        html_lines += f'''<img src="{pfpName}"><h3><a href="{userlink}">{username}</a></h3>
+        html_lines += f'''<img src="{pfpName}" class="pfp"><h3><a href="{userlink}">{username}</a></h3>
         <h5>{entry_data[index]["published"]}</h5>
         <p>{content}</p>
         <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
