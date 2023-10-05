@@ -7,13 +7,15 @@ def start():
         #__parse url
         url = "https://kitty.social/@deletecat/rss"
         feed = feedparser.parse(url)
+        #__declare variables variables
         username = feed.feed['title']
         userlink = feed.feed['link']
-        userpfp = feed.feed.image['href']
+        userPFPUrl = feed.feed.image['href']
     except:
+        #__this will only happen if a connection to the server fails and/or the url is incorrect
         exit("Error, no connection or incorrect url")
     else:
-        return username, userlink, userpfp, feed
+        return username, userlink, userPFPUrl, feed
 
 def grabEntryData(feed):
     entry_data = [] #__array will store entry dictionaries
@@ -38,22 +40,22 @@ def grabEntryData(feed):
             entry_data.append(entry_temp) #__add our temporary dictionary to our array
     return entry_data
 
-def getPFP(feed):
-    #__this section is janky code whjch might not work on all instances, will probably rewrite at some point
+def getPFPName(userPFPUrl):
     #__declare variables
-    pfpName = ""
-    slashCounter = 0
-    #__repeat for every character in the pfp file url (probably inefficient)
-    for index in range(len(feed.feed.image['href'])):
-        #__count every forward slash
-        if feed.feed.image['href'][index] == "/":
-            slashCounter+=1
-        #__cdn url has 4 forward slashes (including for protocol (https://)), 4th slash should have pfp (or at least it does on kitty.social)
-        if slashCounter == 4:
-            #__set the name of the file to pfpName (used for generating the rss page)
-            pfpName = feed.feed.image['href'][index+1:]
-            #__stop the loop as continuing would be silly
+    pfpName = "" #__used to store the file name of the profile picture
+    endOfName = len(userPFPUrl) - 1 #__initially stores the position of the last character in the url, later used to find where the file name begins
+    #__repeat for every character in the url
+    for index in range(endOfName):
+        #__check if the next character is a forward slash
+        if userPFPUrl[endOfName] == "/":
+            #__set the file name to every character after the forward slash
+            pfpName = userPFPUrl[endOfName+1:]
+            #__end the loop
             break
+        #__otherwise, go back a character
+        else:
+            endOfName -= 1
+    #__return the file name stored in pfpName
     return pfpName
 
 def generatePage(entry_data, pfpName, userlink, username):
@@ -119,14 +121,14 @@ def createPage(pfpName, userpfp, html_lines):
         print("Page created successfully!")
 
 def main():
-    username, userlink, userpfp, feed = start()
+    username, userlink, userPFPUrl, feed = start()
     entry_data = grabEntryData(feed)
-    pfpName = getPFP(feed)
+    pfpName = getPFPName(userPFPUrl)
     old_html, html_lines = generatePage(entry_data, pfpName, userlink, username)
     if old_html != html_lines:
-        createPage(pfpName, userpfp, html_lines)
+        createPage(pfpName, userPFPUrl, html_lines)
     else:
-        print("No changes needed.")
+       print("No changes needed.")
     
 if __name__ == "__main__":
     main()
