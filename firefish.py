@@ -91,10 +91,14 @@ def generatePage(entry_data, pfpName, userlink, username):
         <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
     #__end page
     html_lines += "</body>\n</html>"
-    old_html = oldHTMLChecking()
-    return old_html, html_lines
+    changes = oldHTMLChecking(html_lines)
+    if changes == True:
+        return html_lines
+    else:
+        exit("No changes have been made")
 
-def oldHTMLChecking():
+def oldHTMLChecking(html_lines):
+    changes = True
     old_html = "" #__store old html code
     #__old html checking
     old_file = os.path.isfile('index.html')
@@ -105,7 +109,11 @@ def oldHTMLChecking():
             #__add each line from old file to old_html
             for line in reader:
                 old_html += line 
-    return old_html
+        if old_html == html_lines:
+            changes=False
+    else:
+        changes = True
+    return changes
 
 def createPage(pfpName, userpfp, html_lines):
     #__check if the current profile picture doesn't exist - this should only download a new pfp if neccessary 
@@ -124,11 +132,8 @@ def main():
     username, userlink, userPFPUrl, feed = start()
     entry_data = grabEntryData(feed)
     pfpName = getPFPName(userPFPUrl)
-    old_html, html_lines = generatePage(entry_data, pfpName, userlink, username)
-    if old_html != html_lines:
-        createPage(pfpName, userPFPUrl, html_lines)
-    else:
-       print("No changes needed.")
-    
+    html_lines = generatePage(entry_data, pfpName, userlink, username)
+    createPage(pfpName, userPFPUrl, html_lines)
+
 if __name__ == "__main__":
     main()
