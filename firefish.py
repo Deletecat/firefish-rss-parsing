@@ -111,8 +111,6 @@ def oldHTMLChecking(html_lines):
                 old_html += line 
         if old_html == html_lines:
             changes=False
-    else:
-        changes = True
     return changes
 
 def createPage(pfpName, userpfp, html_lines):
