@@ -91,10 +91,10 @@ def generatePage(entry_data, pfpName, userlink, username):
         <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
     #__end page
     html_lines += "</body>\n</html>"
-    old_html = oldHTMLChecking(html_lines)
+    old_html = oldHTMLChecking()
     return old_html, html_lines
 
-def oldHTMLChecking(html_lines):
+def oldHTMLChecking():
     old_html = "" #__store old html code
     #__old html checking
     old_file = os.path.isfile('index.html')
