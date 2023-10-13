@@ -40,7 +40,7 @@ def grabEntryData(feed):
             entry_data.append(entry_temp) #__add our temporary dictionary to our array
     return entry_data
 
-def getPFPName(userPFPUrl):
+def getFileName(userPFPUrl):
     #__declare variables
     pfpName = "" #__used to store the file name of the profile picture
     endOfName = len(userPFPUrl) - 1 #__initially stores the position of the last character in the url, later used to find where the file name begins
@@ -122,11 +122,11 @@ def mediaChecking(entry_data,index):
     #__for every item in the list...
     for x in range(len(entry)):
         #__check to see if the current item contains an image tag or video tag
-        if entry[x] == "/><img" or entry[x] == "<video": #__break lines between images get separated
+        if entry[x] == "/><img" or entry[x] == "/><video" or entry[x] == "/><audio": #__break lines between media get split in two
             #__set the download url of the file - next item includes the source, this will only take out the url for the file
             downloadUrl = entry[x+1][5:len(entry[x+1])-1]
             #__set the name of the downloaded file for page generation
-            fileName = f"./media/{getPFPName(downloadUrl)}"
+            fileName = f"./media/{getFileName(downloadUrl)}"
             #__change the source item to the new file name
             entry[x+1] = f'src="{fileName}"'
             #__checks if the file exists, if it doesn't, the file will be downloaded
@@ -156,7 +156,7 @@ def createPage(pfpName, userpfp, html_lines):
 def main():
     username, userlink, userPFPUrl, feed = start()
     entry_data = grabEntryData(feed)
-    pfpName = getPFPName(userPFPUrl)
+    pfpName = getFileName(userPFPUrl)
     html_lines = generatePage(entry_data, pfpName, userlink, username)
     createPage(pfpName, userPFPUrl, html_lines)
 
