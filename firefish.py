@@ -20,7 +20,7 @@ def start():
 def grabEntryData(feed):
     entry_data = [] #__array will store entry dictionaries
     entry_no = 0    #__variable will store number of entries
-    entry_max = 6   #__variable will store max number of entries displayed
+    entry_max = 4   #__variable will store max number of entries displayed
     #__repeat for every entry in the feed
     for index in range(len(feed.entries)):
         #__set the entry to be the current entry
@@ -59,8 +59,7 @@ def getPFPName(userPFPUrl):
     return pfpName
 
 def generatePage(entry_data, pfpName, userlink, username):
-    stylesheet = "style.css"
-    javascript = "script.js"
+    stylesheet = "style.css" #__set name of the CSS file
     #__set initial lines of html
     html_lines = f"""<!DOCTYPE html> 
     <html lang="en"> 
@@ -68,30 +67,32 @@ def generatePage(entry_data, pfpName, userlink, username):
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <link rel="stylesheet" href="{stylesheet}">
-        <script src="{javascript}"></script>
         <title>RSS Feed</title>
     </head>
     <body>
     """
-
     #__repeat for every entry in the feed
     for index in range(len(entry_data)):
+        #__<span> removal needs rewritten I think
         #__repeat for every letter in the content of the entry
         for contIndex in range(len(entry_data[index]['content'])):
             #__removes <span> from the output
             if entry_data[index]['content'][contIndex] == "<" and entry_data[index]['content'][contIndex+1] == "s":
-                content = entry_data[index]['content'][:contIndex-1]
+                entry_data[index]['content'] = entry_data[index]['content'][:contIndex-1]
                 break #__the loop no longer has to continue
         #__replaces new lines with <br> tags
-        content=content.replace("\n","<br>")
+        entry_data[index]['content']=entry_data[index]['content'].replace("\n","<br>")
+        entry_data[index]['content'] = mediaChecking(entry_data,index) #__checks for any media attached to the post. Always returns data to `content`
         #__add entry data to page
         html_lines += f'''<img src="{pfpName}" class="pfp"><h3><a href="{userlink}">{username}</a></h3>
         <h5>{entry_data[index]["published"]}</h5>
-        <p>{content}</p>
+        <p>{entry_data[index]['content']}</p>
         <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
     #__end page
     html_lines += "</body>\n</html>"
+    #__checks to see if there have been any changes to index.html since the script was last run
     changes = oldHTMLChecking(html_lines)
+    #__if there have been changes, return the data stored in html_lines, otherwise terminate the script.
     if changes == True:
         return html_lines
     else:
@@ -112,6 +113,32 @@ def oldHTMLChecking(html_lines):
         if old_html == html_lines:
             changes=False
     return changes
+
+def mediaChecking(entry_data,index):
+    #__split up the entry into a list
+    entry = entry_data[index]['content'].split(" ")
+    #__set an empty variable to store the content of the entry
+    content = ""
+    #__for every item in the list...
+    for x in range(len(entry)):
+        #__check to see if the current item contains an image tag or video tag
+        if entry[x] == "/><img" or entry[x] == "<video": #__break lines between images get separated
+            #__set the download url of the file - next item includes the source, this will only take out the url for the file
+            downloadUrl = entry[x+1][5:len(entry[x+1])-1]
+            #__set the name of the downloaded file for page generation
+            fileName = f"./media/{getPFPName(downloadUrl)}"
+            #__change the source item to the new file name
+            entry[x+1] = f'src="{fileName}"'
+            #__checks if the file exists, if it doesn't, the file will be downloaded
+            if os.path.exists(fileName):
+                print("File already exists, moving on.")
+            else:
+                os.system(f"wget -P ./media {downloadUrl}")
+    for y in range(len(entry)):
+        #__add the item from the list to the content variable
+        content += f"{entry[y]} "
+    #__return the data stored in content
+    return content
 
 def createPage(pfpName, userpfp, html_lines):
     #__check if the current profile picture doesn't exist - this should only download a new pfp if neccessary 
