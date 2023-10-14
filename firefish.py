@@ -20,7 +20,7 @@ def start():
 def grabEntryData(feed):
     entry_data = [] #__array will store entry dictionaries
     entry_no = 0    #__variable will store number of entries
-    entry_max = 4   #__variable will store max number of entries displayed
+    entry_max = 10   #__variable will store max number of entries displayed
     #__repeat for every entry in the feed
     for index in range(len(feed.entries)):
         #__set the entry to be the current entry
@@ -81,22 +81,19 @@ def generatePage(entry_data, pfpName, userlink, username):
                 entry_data[index]['content'] = entry_data[index]['content'][:contIndex-1]
                 break #__the loop no longer has to continue
         #__replaces new lines with <br> tags
-        entry_data[index]['content']=entry_data[index]['content'].replace("\n","<br>")
-        entry_data[index]['content'] = mediaChecking(entry_data,index) #__checks for any media attached to the post. Always returns data to `content`
+        entry_data[index]['content'] = entry_data[index]['content'].replace("\n","<br>")
+        entry_data[index]['content'] = entryEditing(entry_data,index) #__checks for any media attached to the post. Always returns data to `content`
         #__add entry data to page
         html_lines += f'''<img src="{pfpName}" class="pfp"><h3><a href="{userlink}">{username}</a></h3>
         <h5>{entry_data[index]["published"]}</h5>
         <p>{entry_data[index]['content']}</p>
         <span><a href="{entry_data[index]["entrylink"]}">Link to post</a></span><hr>\n'''
     #__end page
-    html_lines += "</body>\n</html>"
+    html_lines += f'<a href="{userlink}">View older posts</a>\n</body>\n</html>'
     #__checks to see if there have been any changes to index.html since the script was last run
     changes = oldHTMLChecking(html_lines)
-    #__if there have been changes, return the data stored in html_lines, otherwise terminate the script.
-    if changes == True:
-        return html_lines
-    else:
-        exit("No changes have been made")
+    #__return html_lines and changes status
+    return html_lines, changes
 
 def oldHTMLChecking(html_lines):
     changes = True
@@ -110,11 +107,12 @@ def oldHTMLChecking(html_lines):
             #__add each line from old file to old_html
             for line in reader:
                 old_html += line 
+        #__if the newly generated html lines are the same as the old html lines, there have been no changes
         if old_html == html_lines:
             changes=False
     return changes
 
-def mediaChecking(entry_data,index):
+def entryEditing(entry_data,index):
     #__split up the entry into a list
     entry = entry_data[index]['content'].split(" ")
     #__set an empty variable to store the content of the entry
@@ -134,9 +132,12 @@ def mediaChecking(entry_data,index):
                 print("File already exists, moving on.")
             else:
                 os.system(f"wget -P ./media {downloadUrl}")
-    for y in range(len(entry)):
+        #__if there aren't any media tags, check to see if the current entry begins with http:// or https://
+        elif entry[x][:7] == "http://" or entry[x][:8] == "https://":
+            #__create an anchor tag to make a hyperlink
+            entry[x] = f'<a href="{entry[x]}">{entry[x]}</a>'
         #__add the item from the list to the content variable
-        content += f"{entry[y]} "
+        content += f"{entry[x]} "
     #__return the data stored in content
     return content
 
@@ -157,8 +158,11 @@ def main():
     username, userlink, userPFPUrl, feed = start()
     entry_data = grabEntryData(feed)
     pfpName = getFileName(userPFPUrl)
-    html_lines = generatePage(entry_data, pfpName, userlink, username)
-    createPage(pfpName, userPFPUrl, html_lines)
+    html_lines, changes = generatePage(entry_data, pfpName, userlink, username)
+    if changes == True:
+        createPage(pfpName, userPFPUrl, html_lines)
+    else:
+        print("No changes have been made")
 
 if __name__ == "__main__":
     main()
