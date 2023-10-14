@@ -21,6 +21,8 @@ sudo apt install python3 python3-feedparser wget
 
 This may be different for the distribution you are using.
 
+An example CSS file has been included with the releases, feel free to tweak it if you so wish!
+
 ## What data does this script use?
 
 This script uses the following data from the rss feed:
@@ -36,7 +38,7 @@ This script uses the following data from the rss feed:
 
 You can change the following variables in the script to use your firefish account instead:
 - url - replace with your firefish's account rss feed
-- stylesheet - replace with the name of your stylesheet
+- stylesheet - replace with the name of your stylesheet (css)
 - entry_max - if you want more entries to be displayed, change this value.
 
 As of right now, I am running this script on my personal site; <https://deletecat.com>. Feel free to look there if you want to see the script in action!
