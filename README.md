@@ -41,4 +41,4 @@ You can change the following variables in the script to use your firefish accoun
 - stylesheet - replace with the name of your stylesheet (css)
 - entry_max - if you want more entries to be displayed, change this value.
 
-As of right now, I am running this script on my personal site; <https://deletecat.com>. Feel free to look there if you want to see the script in action!
+### This project is currently on hold, I plan to work on it again when I have more free time :)
